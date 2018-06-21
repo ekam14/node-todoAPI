@@ -105,4 +105,46 @@ describe('GET /todos/:id',() => {
     .expect(404)   //can simply write this and get a 404 status code //
     .end(done);
   });
+
+});
+
+
+describe('DELETE /todos/:id',() => {
+  it('should remove a todo',(done) => {
+    var hexId = new ObjectID(todos[1]._id).toHexString();
+    request(app)
+    .delete(`/todos/${hexId}`)
+    .expect(200)
+    .expect((res) => {
+      expect(res.body.todo._id).toBe(hexId);
+    })
+    .end((err,res) => {
+      if(err){
+        return done(err);
+      }
+      todo.findById(hexId).then((todo) => {
+        expect(todo).toNotExist();
+        done();
+      }).catch((e) => done(e));
+    })
+  });
+
+  it('should return 404 for todo not found',(done) => {
+    var hexId = new ObjectID().toHexString(); //creating a new ID which will generate no todo//
+    request(app)
+    .delete(`/todos/${hexId}`)
+    .expect(404)
+    .expect((res) => {
+      expect(res.body).toEqual({});   //toEqual is better than toBe when we have to compare the objects //
+    })
+    .end(done);
+  });
+
+  it('should return 400 for invalid ID',(done) => {
+    var id = 1223;
+    request(app)
+    .delete(`/todos/${id}`)
+    .expect(404)   //can simply write this and get a 404 status code //
+    .end(done);
+  });
 });
