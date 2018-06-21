@@ -1,0 +1,20 @@
+const mongoose = require('mongoose');
+
+var todo = mongoose.model('Todo',{    //mongodb will create a collection names todos (plural of todo)
+  text:{
+    type: String,
+    required: true,
+    minlength: 1,
+    trim: true    //will ignore all the white spaces
+  },
+  completed:{
+    type: Boolean,
+    default: false
+  },
+  completedAt:{
+    type: Number,
+    default: null
+  }
+});
+
+module.exports = {todo};
