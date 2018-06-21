@@ -6,6 +6,8 @@ const {mongoose} = require('./db/mongoose.js');
 const {todo} = require('./models/todo.js');
 const {user} = require('./models/user.js');
 
+const port = process.env.PORT || 3000;
+
 var app = express();
 
 app.use(bodyParser.json());  // app.use i.e we want to use a method of a module of node.js //
@@ -43,8 +45,8 @@ app.get('/todos/:id',(req,res) => {           //for getting invidivual todo
   }).catch((err) => res.status(400).send());
 });
 
-app.listen(3000,() => {
-  console.log('App started on port 3000');
+app.listen(port,() => {
+  console.log(`App started on port ${port}`);
 });
 
 module.exports = {app};
