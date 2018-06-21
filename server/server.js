@@ -29,7 +29,7 @@ app.get('/todos',(req,res) => {
   });
 });
 
-app.get('/todos/:id',(req,res) => {
+app.get('/todos/:id',(req,res) => {           //for getting invidivual todo
   var id = req.params.id;
   if(!ObjectID.isValid(id)){
     return res.status(404).send('Not a valid ID');
@@ -39,7 +39,7 @@ app.get('/todos/:id',(req,res) => {
     if(!todo){
       return res.status(404).send('No todos found');
     }
-    res.status(200).send({todo});
+    res.status(200).send({todo});    //will send the todo object to the server and only this todo can be used later for parsing //
   }).catch((err) => res.status(400).send());
 });
 

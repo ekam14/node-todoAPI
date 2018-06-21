@@ -3,10 +3,13 @@ const request = require('supertest');
 
 const {todo} = require('./../models/todo');
 const {app} = require('./../server');
+const {ObjectID} = require('mongodb');
 
 const todos = [{
+  _id: new ObjectID(),
   text: 'First test todo'
 }, {
+  _id: new ObjectID(),
   text: 'Second test todo'
 }];
 
@@ -69,6 +72,37 @@ describe('GET /todos',() => {
     .expect((res) => {
       expect(res.body.doc.length).toBe(2);
     })
+    .end(done);
+  });
+});
+
+describe('GET /todos/:id',() => {
+  it('should return todo doc',(done) => {
+    request(app)
+    .get(`/todos/${todos[0]._id.toHexString()}`)  //send a request to the id provided//
+    .expect(200)  //status code 200 'OK'//
+    .expect((res) => {  //return result//
+      expect(res.body.todo.text).toBe(todos[0].text);     //will check by parsing the body object of the app's todo array//
+    })
+    .end(done);
+  });
+
+  it('should return 404 for todo not found',(done) => {
+    var hexId = new ObjectID().toHexString(); //creating a new ID which will generate no todo//
+    request(app)
+    .get(`/todos/${hexId}`)
+    .expect(404)
+    .expect((res) => {
+      expect(res.body).toEqual({});   //toEqual is better than toBe when we have to compare the objects //
+    })
+    .end(done);
+  });
+
+  it('should return 400 for invalid ID',(done) => {
+    var id = 1223;
+    request(app)
+    .get(`/todos/${id}`)
+    .expect(404)   //can simply write this and get a 404 status code //
     .end(done);
   });
 });
