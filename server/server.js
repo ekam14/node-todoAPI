@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const express = require('express');
 const bodyParser = require('body-parser');
 const {ObjectID} = require('mongodb');
@@ -57,6 +58,28 @@ app.delete('/todos/:id',(req,res) => {
     }
     res.status(200).send({todo});    //will send the todo object to the server and only this todo can be used later for parsing //
   }).catch((err) => res.status(400).send());
+});
+
+app.patch('/todos/:id',(req,res) => {
+  var id = req.params.id;
+  var body = _.pick(req.body,['text','completed']);  // will only allow to use the commands given in the brackets //
+  if(!ObjectID.isValid(id)){
+    return res.status(404).send('Invalid ID');
+  }
+
+  if(_.isBoolean(body.completed) && body.completed){
+    body.completedAt= new Date().getTime();
+  }else{
+    body.completed= false;
+    body.completedAt= null;
+  }
+
+  todo.findByIdAndUpdate(id,{$set: body},{new: true}).then((todo) => {
+    if(!todo){
+      return res.status(404).send('No todo was found');
+    }
+    res.status(200).send({todo});
+  }).catch((err) => res.status(400).send(err));
 });
 
 app.listen(port,() => {
