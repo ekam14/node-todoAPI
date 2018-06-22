@@ -1,3 +1,14 @@
+var env = process.env.NODE_ENV || 'development';
+console.log('*******env*********:',env);
+
+if(env === 'development'){
+  process.env.PORT = 3000;
+  process.env.MONGODB_URI = 'mongodb://localhost:27017/TodoApp';
+}else if(env === 'test'){
+  process.env.PORT = 3000;
+  process.env.MONGODB_URI = 'mongodb://localhost:27017/TodoAppTest';
+}
+
 const _ = require('lodash');
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -7,7 +18,7 @@ const {mongoose} = require('./db/mongoose.js');
 const {todo} = require('./models/todo.js');
 const {user} = require('./models/user.js');
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT;
 
 var app = express();
 
@@ -78,7 +89,7 @@ app.patch('/todos/:id',(req,res) => {
     if(!todo){
       return res.status(404).send('No todo was found');
     }
-    res.status(200).send({todo});
+    res.status(200).send({todo});    //todo will be used in test.js //
   }).catch((err) => res.status(400).send(err));
 });
 
