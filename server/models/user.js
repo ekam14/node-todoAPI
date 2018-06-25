@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
 const _ = require('lodash');
+const bcrypt = require('bcryptjs');
 
 var userSchema = new mongoose.Schema({
   email:{
@@ -18,7 +19,7 @@ var userSchema = new mongoose.Schema({
   password:{
     type: String,
     required: true,
-    minlength: 6
+    minlength: 2
   },
   tokens:[{
     access:{
@@ -32,7 +33,6 @@ var userSchema = new mongoose.Schema({
   }]
 });
 
-//It's automatically called when we respond to the express request with res.send. That converts our object to a string by calling JSON.stringify. JSON.stringify is what calls toJSON.
 
 userSchema.methods.toJSON = function(){
   var user = this;
@@ -69,6 +69,40 @@ userSchema.statics.findByToken = function(token){
     'tokens.access': 'auth'
   });
 };
+
+userSchema.statics.findByCredentials = function(email,password){
+  var User = this;
+
+  return User.findOne({email}).then((user) => {   // returning promise to use .then() there in route handler //
+    if(!user){
+      return Promise.reject();  // wiil go directly to the catch statement //
+    }
+    return new Promise((resolve,reject) => {  // making a new promise because bcrypt is does not return a promise //
+      bcrypt.compare(password,user.password,(err,res) => {
+        if(res){
+          resolve(user);  // send the user object back //
+        }
+        else{
+          reject();
+        }
+      });
+    });
+  });
+};
+
+userSchema.pre('save',function(next){
+  var user = this;
+  if(user.isModified('password')){
+    bcrypt.genSalt(10,(err,salt) => {
+      bcrypt.hash(user.password,salt,(err,hash) => {
+        user.password = hash;
+        next();
+      });
+    });
+  }else {
+    next();
+  }
+});
 
 var User = mongoose.model('User',userSchema);
 

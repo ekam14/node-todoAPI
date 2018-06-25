@@ -1,0 +1,8 @@
+1))This typically happens on slower machines where it takes a bit longer to process everything. This is fine for your local development setup, you just need to tweak the command to allow for a bit more time.
+
+You can fix this by customize the mocha part of our test command. For example, the below allows for 4 seconds before throwing an error:
+
+mocha --timeout=4000 server/**/*.test.js
+
+
+2))(.JSON)It's automatically called when we respond to the express request with res.send. That converts our object to a string by calling JSON.stringify. JSON.stringify is what calls toJSON.
