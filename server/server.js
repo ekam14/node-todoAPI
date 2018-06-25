@@ -95,7 +95,7 @@ app.post('/users', (req, res) => {
   user.save().then(() => {
     return user.generateAuthToken();   // generates a new token using jwt.sign() //
   }).then((token) => {
-    res.header('x-auth', token).send(user);
+    res.header('x-auth', token).send(user);  // tpken is send via custom header x-auth //
   }).catch((e) => {
     res.status(400).send(e);
   })
@@ -126,6 +126,13 @@ app.post('/users/login',(req,res) => {
   });
 });
 
+
+// Logging Out
+app.delete('/users/me/token',authenticate,(req,res) => {
+  req.user.removeToken(req.token).then(() => {
+    res.status(200).send();
+  }).catch((e) => res.status(401).send());
+});
 
 app.listen(port,() => {
   console.log(`App started on port ${port}`);
