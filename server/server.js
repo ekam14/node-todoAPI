@@ -16,12 +16,13 @@ const port = process.env.PORT;
 app.use(bodyParser.json());  // app.use i.e we want to use a method of a module of node.js tells bodyParser to parse only JSON data//
 
 // POST /todos //
-app.post('/todos',(req,res) => {   //saving todo to the database //
+app.post('/todos',authenticate,(req,res) => {   //saving todo to the database //
   var newTodo = new todo({
-    text: req.body.text   // sets text equal to the body.text given in body //
+    text: req.body.text,   // sets text equal to the body.text given in body //
+    _creator: req.user._id   //is set to the id of the user who created this todo //
   });
-  newTodo.save().then((doc) => {  //saves the new Todo to the database //
-    res.send(doc);
+  newTodo.save().then((todo) => {  //saves the new Todo to the database //
+    res.send(todo);
   },(err) => {
     res.status(400).send(err);   // status(400) is for bad request //
   });
@@ -29,21 +30,23 @@ app.post('/todos',(req,res) => {   //saving todo to the database //
 
 
 // GET /todos //
-app.get('/todos',(req,res) => {
-  todo.find().then((doc) => {
-    res.send({doc});  //sending all the todos to the server
+app.get('/todos',authenticate,(req,res) => {
+  todo.find({
+    _creator:req.user._id
+  }).then((todo) => {
+    res.send({todo});  //sending all the todos to the server
   },(err) => {
     res.send(err);
   });
 });
 
-app.get('/todos/:id',(req,res) => {           //for getting invidivual todo
+app.get('/todos/:id',authenticate,(req,res) => {           //for getting invidivual todo
   var id = req.params.id;
   if(!ObjectID.isValid(id)){
     return res.status(404).send('Not a valid ID');
   }
 
-  todo.findById(id).then((todo) => {
+  todo.findOne({_id:id,_creator:req.user._id}).then((todo) => {
     if(!todo){
       return res.status(404).send('No todos found');
     }
@@ -51,13 +54,13 @@ app.get('/todos/:id',(req,res) => {           //for getting invidivual todo
   }).catch((err) => res.status(400).send());
 });
 
-app.delete('/todos/:id',(req,res) => {
+app.delete('/todos/:id',authenticate,(req,res) => {
   var id = req.params.id;
   if(!ObjectID.isValid(id)){
     return res.status(404).send('Not a valid ID');
   }
 
-  todo.findByIdAndRemove(id).then((todo) => {
+  todo.findOneAndRemove({_id:id,_creator:req.user._id}).then((todo) => {
     if(!todo){
       return res.status(404).send('No todos found');
     }
@@ -65,7 +68,7 @@ app.delete('/todos/:id',(req,res) => {
   }).catch((err) => res.status(400).send());
 });
 
-app.patch('/todos/:id',(req,res) => {
+app.patch('/todos/:id',authenticate,(req,res) => {
   var id = req.params.id;
   var body = _.pick(req.body,['text','completed']);  // will only allow to use the commands given in the brackets //
   if(!ObjectID.isValid(id)){
@@ -79,7 +82,7 @@ app.patch('/todos/:id',(req,res) => {
     body.completedAt= null;
   }
 
-  todo.findByIdAndUpdate(id,{$set: body},{new: true}).then((todo) => {  // use the update validators //
+  todo.findOneAndUpdate({_id:id,_creator:req.user._id},{$set: body},{new: true}).then((todo) => {  // use the update validators //
     if(!todo){
       return res.status(404).send('No todo was found');
     }

@@ -14,6 +14,10 @@ var todo = mongoose.model('Todo',{    //mongodb will create a collection names t
   completedAt:{
     type: Number,
     default: null
+  },
+  _creator:{
+    type: mongoose.Schema.Types.ObjectId,
+    required: true
   }
 });
 
