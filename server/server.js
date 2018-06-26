@@ -23,9 +23,7 @@ app.post('/todos',authenticate,(req,res) => {   //saving todo to the database //
   });
   newTodo.save().then((todo) => {  //saves the new Todo to the database //
     res.send(todo);
-  },(err) => {
-    res.status(400).send(err);   // status(400) is for bad request //
-  });
+  }).catch((e) => res.status(400).send());
 });
 
 
@@ -35,9 +33,7 @@ app.get('/todos',authenticate,(req,res) => {
     _creator:req.user._id
   }).then((todo) => {
     res.send({todo});  //sending all the todos to the server
-  },(err) => {
-    res.send(err);
-  });
+  }).catch((e) => res.status(400).send());
 });
 
 app.get('/todos/:id',authenticate,(req,res) => {           //for getting invidivual todo
@@ -108,7 +104,7 @@ app.post('/users', (req, res) => {
 app.get('/users',(req,res) => {
   User.find().then((user) => {
     res.send(user);
-  })
+  }).catch((e) => res.status(400).send());
 });
 
 app.get('/users/me',authenticate,(req,res) => {
