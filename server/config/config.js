@@ -3,9 +3,13 @@ console.log('*******env*********:',env);
 
 if(env === 'development' || env === 'test')
 {
-  var config = require('./config.json');  // will automatically parse the json //
-  envConfig = config[env];
+  var config = require('./config.json');  // will automatically parse the json into object//
+  envConfig = config[env];  // will get the apt property //
   Object.keys(envConfig).forEach((key) => {
-    process.env[key] = envConfig[key];
+    process.env[key] = envConfig[key]; //each value in the object //
   });
+}
+else if(env === 'production')
+{
+  process.env.MONGODB_URI = "mongodb://<dbuser>:<dbpassword>@ds117701.mlab.com:17701/node-todo-api-database";
 }
