@@ -11,5 +11,5 @@ if(env === 'development' || env === 'test')
 }
 else if(env === 'production')
 {
-  process.env.MONGODB_URI = "mongodb://<Ekam>:<EKam1997>@ds117701.mlab.com:17701/node-todo-api-database";
+  process.env.MONGODB_URI = "mongodb://Ekam:EKam1997@ds117701.mlab.com:17701/node-todo-api-database";
 }
